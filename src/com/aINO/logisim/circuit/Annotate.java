@@ -9,6 +9,7 @@ import com.aINO.logisim.inogui.INOReport;
 import com.cburch.logisim.circuit.Circuit;
 import com.cburch.logisim.circuit.SubcircuitFactory;
 import com.cburch.logisim.comp.Component;
+import com.cburch.logisim.comp.EndData;
 import com.cburch.logisim.data.AttributeSet;
 import com.cburch.logisim.data.Location;
 import com.cburch.logisim.instance.StdAttr;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -99,6 +101,7 @@ public class Annotate {
             }
         } else {
             ComponentName = comp.getFactory().getHDLName(comp.getAttributeSet());
+            ComponentName = ComponentName.substring(0, ComponentName.indexOf("_"));
         }
         return ComponentName;
     }
@@ -106,12 +109,10 @@ public class Annotate {
     public ArrayList<GeneratorComponent> AnnotateArduino(Circuit Circ, boolean ClearExistingLabels, INOReport MyReporter) {
         /* If I am already completely annotated, return */
         MyReporter.AddInfo("-- ANNOTATE --\n");
-        
-        ArrayList<GeneratorComponent> AnnotatedComponents = new ArrayList<>();
 
         if (Annotated) {
             MyReporter.AddInfo("Nothing to do !");
-            return(null);
+            return (null);
         }
         SortedSet<Component> comps = new TreeSet<Component>(new ArduinoComparator());
         HashMap<String, AutoLabel> lablers = new HashMap<String, AutoLabel>();
@@ -165,7 +166,7 @@ public class Annotate {
                     String ComponentName = GetArduinoAnnotationName(comp);
                     comps.add(comp);
                     if (!lablers.containsKey(ComponentName)) {
-                        lablers.put(ComponentName, new AutoLabel(ComponentName + "0", Circ));
+                        lablers.put(ComponentName, new AutoLabel(ComponentName + "_0", Circ));
                     }
                 }
             }
@@ -178,13 +179,12 @@ public class Annotate {
 
         /* Now Annotate */
         for (Component comp : comps) {
-            //String ComponentName = comp.getAttributeSet().getValue(StdAttr.LABEL);//GetArduinoAnnotationName(comp);
             String ComponentName = GetArduinoAnnotationName(comp);
             if (!lablers.containsKey(ComponentName)
                     || !lablers.get(ComponentName).hasNext(Circ)) {
                 /* This should never happen! */
                 //MyReporter.AddFatalError("Annotate internal Error: Either there exists duplicate labels or the label syntax is incorrect!\nPlease try annotation on labeled components also\n");
-                return(null);
+                return (null);
             } else {
                 AutoLabel NewAuto = lablers.get(ComponentName);
                 String NewLabel = NewAuto.GetCurrent(Circ, comp.getFactory());
@@ -198,9 +198,42 @@ public class Annotate {
                 //System.out.println("Componente " + ComponentName + " [" + part1 + "] nomeado com " + NewLabel);
             }
         }
+
+        int contIn = 0, contOut = 0;
+        ArrayList<GeneratorComponent> CreateComp = new ArrayList<>();
+        for (Component com : Circ.getNonWires()) {
+            List<EndData> ends = com.getEnds();
+            if (com.getFactory().RequiresNonZeroLabel()) {
+                continue;
+            } else {
+                for (EndData end : ends) {
+                    if (end.isOutput()) {
+                        contOut++;
+                    } else {
+                        contIn++;
+                    }
+                }
+            }
+
+            //GeneratorComponent comp = new GeneratorComponent(com, contIn, contOut);
+            //CreateComp.add(comp);
+
+            //GeneratorComponent comp2 = CreateComp.get(1);
+            //GeneratorComponent comp2 = CreateComp.get(1).getInput(0);
+            //comp2.isDefined();
+
+//            MyReporter.AddInfo("Comp: " + com.getAttributeSet().getValue(StdAttr.LABEL)
+//                    + ", contIn: " + contIn + " e contOut: " + contOut);
+//            ArrayList<String> in = GeneratorComp.getInputs();
+//            MyReporter.AddInfo("Inputs: " + in.toString());
+//            ArrayList<String> out = GeneratorComp.getOutputs();
+//            MyReporter.AddInfo("Outputs: " + out.toString());
+            contIn = contOut = 0;
+        }
+
         Annotated = true;
-        
-        return(AnnotatedComponents);
+
+        return (CreateComp);
     }
 
-}
+} // class

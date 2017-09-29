@@ -120,7 +120,7 @@ public class Generate {
             } else {
                 for (EndData end : ends) {
                     Location loc = end.getLocation();
-                    gate = com.getFactory().getName();
+                    gate = com.getAttributeSet().getValue(StdAttr.LABEL);
                     locGate.add(loc + ", " + gate);
                 }
             }
@@ -332,6 +332,7 @@ public class Generate {
 //    public ArrayList<String> getListLoc() {
 //        return listLoc;
 //    }
+    
     public Set<Component> getNonWires() {
         return comps;
     }
