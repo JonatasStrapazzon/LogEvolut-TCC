@@ -5,8 +5,7 @@
  */
 package com.aINO.logisim.inogui;
 
-import com.aINO.logisim.circuit.Annotate;
-import com.aINO.logisim.circuit.Generate;
+import com.aINO.logisim.circuit.*;
 import com.bfh.logisim.designrulecheck.SimpleDRCContainer;
 import com.bfh.logisim.fpgagui.FPGACommanderListModel;
 import com.bfh.logisim.fpgagui.FPGACommanderListWindow;
@@ -48,6 +47,7 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -275,6 +275,7 @@ public class INOCommanderGui implements ActionListener, LibraryListener, Project
 
     private Annotate Annotator = new Annotate();
     private Generate Generator = new Generate();
+    private ArrayList<GeneratorComponent> OutputList = new ArrayList<>();
     private String Generated;
 
     public INOCommanderGui(Project Main) {
@@ -387,7 +388,7 @@ public class INOCommanderGui implements ActionListener, LibraryListener, Project
                 Circ.ClearAnnotationLevel();
             }
 
-            Annotator.AnnotateArduino(Circ, ClearExistingLabels, MyReporter);
+            OutputList = Annotator.AnnotateArduino(Circ, ClearExistingLabels, MyReporter);
             MyReporter.AddInfo("-- Annotation done --\n");
         }
     }
