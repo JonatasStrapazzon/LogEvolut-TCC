@@ -33,12 +33,6 @@ import java.util.TreeSet;
  */
 public class Annotate {
 
-//    this.Convert();
-//    Processa(this);
-//    
-//    public int Processa(Circuit circuito) {
-//        circuito.Convert();
-//    }
     private boolean Annotated;
 
     private static int PinCountD = 2; // digital pins start from 2
@@ -78,25 +72,33 @@ public class Annotate {
         if (comp.getFactory() instanceof Pin) {
             if (comp.getEnd(0).isOutput()) {
                 // INPUT pin!
-                if (comp.getEnd(0).getWidth().getWidth() == 10) {
-                    ComponentName = "A";// + PinCountA;    // analogRead as int
-                    PinCountA++;
-                } else if (comp.getEnd(0).getWidth().getWidth() == 1) {
-                    ComponentName = "D";// + PinCountD;    // digitalRead as boolean
-                    PinCountD++;
-                } else {
-                    ComponentName = "ERROR_I";
+                switch (comp.getEnd(0).getWidth().getWidth()) {
+                    case 10:
+                        ComponentName = "A";// + PinCountA;    // analogRead as int
+                        PinCountA++;
+                        break;
+                    case 1:
+                        ComponentName = "D";// + PinCountD;    // digitalRead as boolean
+                        PinCountD++;
+                        break;
+                    default:
+                        ComponentName = "ERROR_I";
+                        break;
                 }
             } else {
                 // OUTPUT pin!
-                if (comp.getEnd(0).getWidth().getWidth() == 8) {
-                    ComponentName = "D";// + PinCountD;    // analogWrite as byte (8 bits PWM)
-                    PinCountD++;
-                } else if (comp.getEnd(0).getWidth().getWidth() == 1) {
-                    ComponentName = "D";// + PinCountD;    // digitalWrite
-                    PinCountD++;
-                } else {
-                    ComponentName = "ERROR_O";
+                switch (comp.getEnd(0).getWidth().getWidth()) {
+                    case 8:
+                        ComponentName = "D";// + PinCountD;    // analogWrite as byte (8 bits PWM)
+                        PinCountD++;
+                        break;
+                    case 1:
+                        ComponentName = "D";// + PinCountD;    // digitalWrite
+                        PinCountD++;
+                        break;
+                    default:
+                        ComponentName = "ERROR_O";
+                        break;
                 }
             }
         } else {
@@ -152,7 +154,7 @@ public class Annotate {
                     //comp.getAttributeSet().setValue(StdAttr.LABEL, ComponentName);
                     comps.add(comp);
                     if (!lablers.containsKey(ComponentName)) {
-                        if (ComponentName == "D") {
+                        if (ComponentName.equals("D")) {
                             lablers.put(ComponentName, new AutoLabel(ComponentName + "2", Circ));
                         } else {
                             lablers.put(ComponentName, new AutoLabel(ComponentName + "0", Circ));
@@ -201,36 +203,42 @@ public class Annotate {
 
         int contIn = 0, contOut = 0;
         ArrayList<GeneratorComponent> CreateComp = new ArrayList<>();
+        ArrayList<String> labelInp = new ArrayList<>();
+        ArrayList<String> labelOut = new ArrayList<>();
         for (Component com : Circ.getNonWires()) {
             List<EndData> ends = com.getEnds();
             if (com.getFactory().RequiresNonZeroLabel()) {
                 continue;
             } else {
+                MyReporter.AddInfo("Read Comp: " + com.getAttributeSet().getValue(StdAttr.LABEL));
                 for (EndData end : ends) {
+                    Location loc = end.getLocation();
                     if (end.isOutput()) {
                         contOut++;
+                        labelOut.add(loc.toString());
+                        //MyReporter.AddInfo("Output: " + loc);
                     } else {
                         contIn++;
+                        labelInp.add(loc.toString());
+                        //MyReporter.AddInfo("Input: " + loc);
                     }
                 }
             }
-
-            //GeneratorComponent comp = new GeneratorComponent(com, contIn, contOut);
-            //CreateComp.add(comp);
-
-            //GeneratorComponent comp2 = CreateComp.get(1);
-            //GeneratorComponent comp2 = CreateComp.get(1).getInput(0);
-            //comp2.isDefined();
-
-//            MyReporter.AddInfo("Comp: " + com.getAttributeSet().getValue(StdAttr.LABEL)
-//                    + ", contIn: " + contIn + " e contOut: " + contOut);
-//            ArrayList<String> in = GeneratorComp.getInputs();
-//            MyReporter.AddInfo("Inputs: " + in.toString());
-//            ArrayList<String> out = GeneratorComp.getOutputs();
-//            MyReporter.AddInfo("Outputs: " + out.toString());
+            
+//            for(int in =0; in < labelInp.size(); in++)
+//                MyReporter.AddInfo("Com: " + com.getAttributeSet().getValue(StdAttr.LABEL) + " LabelInp: " + labelInp.get(in));
+//        
+//            for(int in =0; in < labelOut.size(); in++)
+//                MyReporter.AddInfo("Com: " + com.getAttributeSet().getValue(StdAttr.LABEL) + " LabelOut: " + labelOut.get(in));
+        
+            GeneratorComponent comp = new GeneratorComponent(com, contIn, contOut, labelInp, labelOut);
+            CreateComp.add(comp);
+            
             contIn = contOut = 0;
+            labelInp.clear();
+            labelOut.clear();
         }
-
+        
         Annotated = true;
 
         return (CreateComp);

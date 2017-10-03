@@ -7,6 +7,8 @@ package com.aINO.logisim.circuit;
 
 import java.util.ArrayList;
 import com.cburch.logisim.comp.*;
+import com.cburch.logisim.data.Location;
+import com.cburch.logisim.instance.StdAttr;
 
 /**
  *
@@ -14,15 +16,19 @@ import com.cburch.logisim.comp.*;
  */
 public class GeneratorComponent {
 
-    private String MyLabel;
     private Component Comp;
     private ArrayList<String> Inputs;
     private ArrayList<String> Outputs;
+    private ArrayList<String> labelInp;
+    private ArrayList<String> labelOut;
 
-    public GeneratorComponent(Component Comp, int In, int Out) {
+    public GeneratorComponent(Component Comp, int In, int Out, 
+            ArrayList<String> labelInputs, ArrayList<String> labelOutputs) {
         Inputs = new ArrayList<>();
         Outputs = new ArrayList<>();
-
+        labelInp = new ArrayList<>();
+        labelOut = new ArrayList<>();
+        
         // this component (to get type and label)
         this.Comp = Comp;
 
@@ -36,6 +42,9 @@ public class GeneratorComponent {
             Outputs.add("");
             Out--;
         }
+        
+        labelInp.addAll(labelInputs);
+        labelOut.addAll(labelOutputs);
     }
 
     public void setInput(int i, String Var) {
@@ -65,28 +74,29 @@ public class GeneratorComponent {
         // get i output to Var
         // return empty if not found
         
-        int j;
-        for (j = 0; j < Outputs.size(); j++) {
-            if(j == i)
-                return (Outputs.get(j));
-        }
+       if(i < Outputs.size())
+            return (Outputs.get(i));
+        
+        // 404 not found
         return ("");
     }
 
     public boolean isDefined() {
         // search each list for an empty string, or ""
         // if found, set check = false;
-        boolean check = true;
-        
         int j;
         for (j = 0; j < Inputs.size(); j++) {
             if(Inputs.get(j).equals(""))
-                return(false);
+            {
+                return (false);
+            }
         }
         
         for (j = 0; j < Outputs.size(); j++) {
             if(Outputs.get(j).equals(""))
-                check = false;
+            {
+                return (false);
+            }
         }
         
         return (true);
@@ -94,7 +104,8 @@ public class GeneratorComponent {
 
     public String toCode() {
         String Code = "";
-
+        String Op = getOperationGate();
+        
         // check if all fields are defined
         if (!this.isDefined()) {
             return ("");
@@ -103,10 +114,11 @@ public class GeneratorComponent {
         for (int out = 0; out < Outputs.size(); out++) {
             // output name
             Code = Outputs.get(out) + " = ";
-
+            
             // now adds operations
             for (int inp = 0; inp < Inputs.size(); inp++) {
-                // ...
+                if(inp == Inputs.size()-1) Op = "";
+                Code += Inputs.get(inp) + Op;
             }
 
             // finish code line with ; and a new line char
@@ -115,13 +127,65 @@ public class GeneratorComponent {
 
         return (Code);
     }
+    
+    private String getOperationGate(){
+        String Operation = null;
+        String Gate = getCompName();
+        
+        if(Gate.contains("AND"))
+            Operation = " && ";
+        else if(Gate.contains("OR"))
+            Operation = " || ";
+        else if(Gate.contains("NOT"))
+            Operation = " ! ";
+        else if(Gate.contains("XOR"))
+            Operation = " ^ ";
+     
+        return (Operation);
+    }
 
     public ArrayList<String> getInputsPort() {
-        return Inputs;
+        return (Inputs);
     }
 
     public ArrayList<String> getOutputsPort() {
-        return Outputs;
+        return (Outputs);
     }
-
+    
+    public Component getComp(){
+        return (Comp);
+    }
+    
+    public String getCompName(){
+        return (Comp.getAttributeSet().getValue(StdAttr.LABEL));
+    }
+    
+    public ArrayList<String> getLabelInp(){
+        return (labelInp);
+    }
+    
+    public ArrayList<String> getLabelOut(){
+        return (labelOut);
+    }
+    
+    public int getIndex(Location loc){
+        int index;
+        
+        for(int l=0; l < labelInp.size(); l++){
+            if(labelInp.get(l).contains(loc.toString())){
+                index = l;
+                return (index);
+            }
+        }
+        
+        for(int l=0; l < labelOut.size(); l++){
+            if(labelOut.get(l).contains(loc.toString())){
+                index = l;
+                return (index);
+            }
+        }
+        
+        return (-1);
+    }
+    
 }
