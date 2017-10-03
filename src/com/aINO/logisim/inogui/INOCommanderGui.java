@@ -398,7 +398,7 @@ public class INOCommanderGui implements ActionListener, LibraryListener, Project
         Set<Component> components = null;
         components = MyProject.getCurrentCircuit().getNonWires();
         int z;
-        int ret = Generator.Generate(MyProject, MyReporter);
+        int ret = Generator.Generate(MyProject, MyReporter, OutputList);
 
         switch (ret) {
             case 1:
@@ -411,9 +411,13 @@ public class INOCommanderGui implements ActionListener, LibraryListener, Project
                 break;
             case 3:
                 MyReporter.AddError(" ** LIST LOC WIRE UNMATCH: Different sizes ** " + "\n");
+                break;
+            case 4:
+                MyReporter.AddError(" ** Circuit ERROR, check loose wires or ports without connections ** " + "\n");
+                break;
             default:
                 try {
-                    if (Generated == "") {
+                    if (Generated.equals("")) {
                         doSaveAs(components);
                     } else {
                         doSave(Generated, components);
