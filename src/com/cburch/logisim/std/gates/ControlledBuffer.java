@@ -88,7 +88,7 @@ class ControlledBuffer extends InstanceFactory {
 					NotGate.ATTR_SIZE, ATTR_CONTROL, StdAttr.LABEL,
 					StdAttr.LABEL_FONT }, new Object[] { Direction.EAST,
 					BitWidth.ONE, NotGate.SIZE_WIDE, RIGHT_HANDED, "",
-					StdAttr.DEFAULT_LABEL_FONT });
+					StdAttr.DEFAULT_LABEL_FONT_PORT });
 		} else {
 			setAttributes(new Attribute[] { StdAttr.FACING, StdAttr.WIDTH,
 					ATTR_CONTROL, StdAttr.LABEL, StdAttr.LABEL_FONT },

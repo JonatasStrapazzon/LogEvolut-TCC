@@ -216,15 +216,13 @@ public class Annotate {
                     if (end.isOutput()) {
                         contOut++;
                         labelOut.add(loc.toString());
-                        //MyReporter.AddInfo("Output: " + loc);
                     } else {
                         contIn++;
                         labelInp.add(loc.toString());
-                        //MyReporter.AddInfo("Input: " + loc);
                     }
                 }
             }
-        
+
             GeneratorComponent comp = new GeneratorComponent(com, contIn, contOut, labelInp, labelOut);
             CreateComp.add(comp);
             

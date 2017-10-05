@@ -129,7 +129,7 @@ class NotGate extends InstanceFactory {
 				ATTR_SIZE, GateAttributes.ATTR_OUTPUT, StdAttr.LABEL,
 				StdAttr.LABEL_FONT, }, new Object[] { Direction.EAST,
 				BitWidth.ONE, SIZE_WIDE, GateAttributes.OUTPUT_01, "",
-				StdAttr.DEFAULT_LABEL_FONT, });
+				StdAttr.DEFAULT_LABEL_FONT_PORT, });
 		setFacingAttribute(StdAttr.FACING);
 		setKeyConfigurator(new BitWidthConfigurator(StdAttr.WIDTH));
 	}

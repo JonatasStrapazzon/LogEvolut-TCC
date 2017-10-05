@@ -92,8 +92,22 @@ public class GeneratorComponent {
             }
         }
         
+        return (true);
+    }
+    
+    public boolean isFinished(){
+        // search each list for an empty string, or ""
+        // if found, set check = false;
+        int j;
         for (j = 0; j < Outputs.size(); j++) {
             if(Outputs.get(j).equals(""))
+            {
+                return (false);
+            }
+        }
+        
+        for (j = 0; j < Inputs.size(); j++) {
+            if(Inputs.get(j).equals(""))
             {
                 return (false);
             }
@@ -105,6 +119,8 @@ public class GeneratorComponent {
     public String toCode() {
         String Code = "";
         String Op = getOperationGate();
+        String Suf = getSuffixGate();
+        String Pref = getPrefixGate();
         
         // check if all fields are defined
         if (!this.isDefined()) {
@@ -118,7 +134,7 @@ public class GeneratorComponent {
             // now adds operations
             for (int inp = 0; inp < Inputs.size(); inp++) {
                 if(inp == Inputs.size()-1) Op = "";
-                Code += Inputs.get(inp) + Op;
+                Code += Pref + Inputs.get(inp) + Suf + Op;
             }
 
             // finish code line with ; and a new line char
@@ -132,14 +148,44 @@ public class GeneratorComponent {
         String Operation = "";
         String Gate = getCompName();
         
-        if(Gate.contains("AND"))
+        if(Gate.contains("AND") || Gate.contains("NAND"))
             Operation = " && ";
-        else if(Gate.contains("OR"))
+        else if(Gate.contains("OR") || Gate.contains("NOR"))
             Operation = " || ";
-        else if(Gate.contains("NOT"))
-            Operation = " ! ";
-        else if(Gate.contains("XOR"))
+        else if(Gate.contains("XOR") || Gate.contains("XNOR"))
             Operation = " ^ ";
+     
+        return (Operation);
+    }
+    
+    private String getPrefixGate(){
+        String Operation = "";
+        String Gate = getCompName();
+        
+        if(Gate.contains("NAND"))
+            Operation = "!(";
+        else if(Gate.contains("NOT"))
+            Operation = "!(";
+        else if(Gate.contains("NOR"))
+            Operation = "!(";
+        else if(Gate.contains("XNOR"))
+            Operation = "!(";
+     
+        return (Operation);
+    }
+    
+      private String getSuffixGate(){
+        String Operation = "";
+        String Gate = getCompName();
+        
+        if(Gate.contains("NAND"))
+            Operation = ")";
+        else if(Gate.contains("NOT"))
+            Operation = ")";
+        else if(Gate.contains("NOR"))
+            Operation = ") ";
+        else if(Gate.contains("XNOR"))
+            Operation = ")";
      
         return (Operation);
     }
@@ -168,11 +214,11 @@ public class GeneratorComponent {
         return (labelOut);
     }
     
-    public int getIndex(Location loc){
+    public int getIndex(String loc){
         int index;
         
         for(int l=0; l < labelInp.size(); l++){
-            if(labelInp.get(l).contains(loc.toString())){
+            if(labelInp.get(l).contains(loc)){
                 index = l;
                 return (index);
             }

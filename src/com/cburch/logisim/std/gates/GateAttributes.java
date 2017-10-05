@@ -87,7 +87,7 @@ class GateAttributes extends AbstractAttributeSet {
 	AttributeOption out = OUTPUT_01;
 	AttributeOption xorBehave;
 	String label = "";
-	Font labelFont = StdAttr.DEFAULT_LABEL_FONT;
+	Font labelFont = StdAttr.DEFAULT_LABEL_FONT_PORT;
 
 	GateAttributes(boolean isXor) {
 		xorBehave = isXor ? XOR_ONE : null;

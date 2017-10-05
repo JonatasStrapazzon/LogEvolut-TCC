@@ -31,6 +31,7 @@ public class Generate {
     private Project MyProject;
     private HashSet<Component> comps = new HashSet<Component>();
     private ArrayList<String> listError = new ArrayList<>();
+    private ArrayList<String> listLocPort = new ArrayList<>();
     private ArrayList<GeneratorComponent> AnnotateList;
 
     public final int No_Errors = 0;
@@ -50,6 +51,7 @@ public class Generate {
 
         //Clear lists
         listError.clear();
+        listLocPort.clear();
 
         MyReporter.AddInfo("-- GENERATE --");
         MyReporter.AddInfo("Project name: " + MyProject.getLogisimFile().getName());
@@ -133,16 +135,12 @@ public class Generate {
 //                }
 //            }
 //        }
-
-
-      
-//    while(!compGen.isDefined()){}
         ArrayList<String> connect;
         GeneratorComponent compGen;
         List<EndData> ends;
         int i, cont = 1;
         String temp = "";
-        
+
         //To set inputs and outputs pins to comps
         for (i = 0; i < AnnotateList.size(); i++) {
             compGen = AnnotateList.get(i);
@@ -154,26 +152,11 @@ public class Generate {
                     connect = getConnections(loc.toString(), locWireStart, locWireEnd,
                             locInComp, locOutComp);
                     if (connect.size() == 1) {
-                        idx = compGen.getIndex(loc);
+                        idx = compGen.getIndex(loc.toString());
                         compGen.setInput(idx, connect.get(0));
                     } else if (connect.size() > 1) {
                         return (Other_Error);
                     } else {
-//                        connect.clear();
-//                        connect = getConnections_port(loc.toString(), locWireStart, locWireEnd, locGate);
-//                        for (int o = 0; o < AnnotateList.size(); o++) {
-//                            if (AnnotateList.get(o).getCompName().contains(connect.get(0))) {
-//                                temp = AnnotateList.get(o).getOutput(0);
-//                            }
-//
-//                        }
-//                        if (temp.equals("")) {
-//                            compGen.setInput(l, "T" + cont);
-//                            cont++;
-//                        } else {
-//                            compGen.setInput(l, temp);
-//                        }
-//                        l++;
                     }
                 } else {
                     connect = getConnections(loc.toString(), locWireStart, locWireEnd,
@@ -181,72 +164,66 @@ public class Generate {
                     if (connect.size() > 1) {
                         return (Other_Error);
                     } else if (connect.size() == 1) {
-                        idx = compGen.getIndex(loc);
-                        compGen.setOutput(idx, connect.get(0));
+                        compGen.setOutput(0, connect.get(0));
                     } else {
-//                        connect.clear();
-//                        connect = getConnections_port(loc.toString(), locWireStart, locWireEnd, locGate);
-//                        for (int o = 0; o < AnnotateList.size(); o++) {
-//                            if (AnnotateList.get(o).getCompName().contains(connect.get(0))) {
-//                                temp = AnnotateList.get(o).getInput(1);
-//                            }
-//
-//                        }
-//                        if (temp.equals("")) {
-//                            compGen.setOutput(0, "T" + cont);
-//                            cont++;
-//                        } else {
-//                            compGen.setOutput(0, temp);
-//                        }
                     }
                 }
                 connect.clear();
             }
 
         }
-        
+
         //To create the temporary variables and generate the code
-        for (i = 0; i < AnnotateList.size(); i++) {
-            compGen = AnnotateList.get(i);
-            ends = compGen.getComp().getEnds();
-            for (EndData end : ends) {
-                Location loc = end.getLocation();
-                if (end.isOutput()) {
+        boolean Defined = false;
+        while (!Defined) {
+            Defined = true;
+            for (i = 0; i < AnnotateList.size(); i++) {
+                compGen = AnnotateList.get(i);
+                ends = compGen.getComp().getEnds();
+                if (compGen.isDefined()) {
                     if (compGen.getOutput(0).equals("")) {
                         compGen.setOutput(0, "T" + cont);
-                        
-                        connect = getConnections_port(loc.toString(), locWireStart, locWireEnd, locGate);
-                        int cnt = connect.size(); 
-                        
-                        for (int o = 0; o < AnnotateList.size(); o++) {
-                            GeneratorComponent compGenInp = AnnotateList.get(o);
-                            while (cnt > 0) { 
-                                if (compGenInp.getCompName().contains(connect.get(cnt - 1))){
-//                                    int idx;
-//                                    idx = compGenInp.getIndex(loc);
-//                                    for (int cpi = 0; cpi < compGenInp.getInputsPort().size(); cpi++) {
-//                                        if (compGenInp.getInput(cpi).equals("")) {
-                                    compGenInp.setInput(0, "T" + cont);
-//                                        }
-//                                    }
+                        MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
+                        for (EndData end : ends) {
+                            Location loc = end.getLocation();
+                            if (end.isOutput()) {
+                                connect = getConnections_port(loc.toString(), locWireStart, locWireEnd, locGate);
+                                ArrayList<String> listLP = getListLocPort();
+
+                                for (int o = 0; o < AnnotateList.size(); o++) {
+                                    for (int x = 0; x < connect.size(); x++) {
+                                        if (AnnotateList.get(o).getCompName().contains(connect.get(x))) {
+                                            for (int l = 0; l < listLP.size(); l++) {
+                                                int idx = AnnotateList.get(o).getIndex(listLP.get(l));
+                                                if (idx > -1) {
+                                                    AnnotateList.get(o).setInput(idx, "T" + cont);
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                                cnt--;
+                                listLP.clear();
                             }
                         }
-                        
-                        
-                        
                         cont++;
                     }
                 }
+                
+                if (!compGen.isFinished()) {
+                    Defined = false;
+                }
             }
             
-            //Generate code to this component if is defined
-            if (compGen.isDefined()) {
-                MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
-            }
+//            for(int y = 0; y < AnnotateList.size(); y++){
+//                if (!AnnotateList.get(y).isFinished()) {
+//                    MyReporter.AddInfo(AnnotateList.get(y).getCompName() + " not is finish!");
+//                    Defined = false;
+//                }
+//                else
+//                   MyReporter.AddInfo(AnnotateList.get(y).getCompName() + " is finish!"); 
+//            }
         }
-        
+
         //SOME INFORMATIONS
         String inf;
         for (i = 0; i < AnnotateList.size(); i++) {
@@ -380,7 +357,9 @@ public class Generate {
             if (locGate.get(j).contains(locAt)) {
                 String name = locGate.get(j);
                 String name2 = name.substring(name.indexOf(")") + 3);
+                String name3 = name.substring(0, name.indexOf(")") + 1);
                 listLoc.add(name2);
+                listLocPort.add(name3);
             }
         }
 
@@ -449,11 +428,6 @@ public class Generate {
             listaWrite += digitalWrite.get(i - 2) + "\n";
         }
 
-        for (i = 0; i < AnnotateList.size(); i++) {
-            GeneratorComponent compGen = AnnotateList.get(i);
-            code += "   " + compGen.toCode();
-        }
-
         String s = listaPinos
                 + "\n"
                 + listaVars
@@ -479,9 +453,10 @@ public class Generate {
         return listError;
     }
 
-//    public ArrayList<String> getListLoc() {
-//        return listLoc;
-//    }
+    public ArrayList<String> getListLocPort() {
+        return listLocPort;
+    }
+
     public Set<Component> getNonWires() {
         return comps;
     }
