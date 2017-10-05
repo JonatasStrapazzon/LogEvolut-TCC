@@ -224,12 +224,6 @@ public class Annotate {
                     }
                 }
             }
-            
-//            for(int in =0; in < labelInp.size(); in++)
-//                MyReporter.AddInfo("Com: " + com.getAttributeSet().getValue(StdAttr.LABEL) + " LabelInp: " + labelInp.get(in));
-//        
-//            for(int in =0; in < labelOut.size(); in++)
-//                MyReporter.AddInfo("Com: " + com.getAttributeSet().getValue(StdAttr.LABEL) + " LabelOut: " + labelOut.get(in));
         
             GeneratorComponent comp = new GeneratorComponent(com, contIn, contOut, labelInp, labelOut);
             CreateComp.add(comp);

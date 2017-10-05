@@ -129,7 +129,7 @@ public class GeneratorComponent {
     }
     
     private String getOperationGate(){
-        String Operation = null;
+        String Operation = "";
         String Gate = getCompName();
         
         if(Gate.contains("AND"))
@@ -177,13 +177,13 @@ public class GeneratorComponent {
                 return (index);
             }
         }
-        
-        for(int l=0; l < labelOut.size(); l++){
-            if(labelOut.get(l).contains(loc.toString())){
-                index = l;
-                return (index);
-            }
-        }
+//        
+//        for(int l=0; l < labelOut.size(); l++){
+//            if(labelOut.get(l).contains(loc.toString())){
+//                index = l;
+//                return (index);
+//            }
+//        }
         
         return (-1);
     }

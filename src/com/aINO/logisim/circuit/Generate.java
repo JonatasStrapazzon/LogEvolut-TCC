@@ -246,39 +246,7 @@ public class Generate {
                 MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
             }
         }
-
-//        for (i = 0; i < AnnotateList.size(); i++) {
-//           compGen = AnnotateList.get(i);
-//           ends = compGen.getComp().getEnds();
-//           for (EndData end : ends) {
-//               Location loc = end.getLocation();
-//               int idx;
-//               if (end.isInput()){
-//                    idx = compGen.getIndex(loc);
-//                    if(compGen.getInput(idx).equals("")){
-//                        connect = getConnections_port(loc.toString(), locWireStart, locWireEnd, locGate);
-//                        for (int o = 0; o < AnnotateList.size(); o++) {
-//                            if (AnnotateList.get(o).getCompName().contains(connect.get(connect.size()-2))) {
-//                                temp = AnnotateList.get(o).getOutput(0);
-//                            }
-//                        }
-//                        compGen.setInput(idx, temp);
-//                    }
-//               }
-//           }
-//           if(compGen.isDefined()){
-//                //Generate code to this component
-//                MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
-//            }
-//        }
-//        
-//        for (i = 0; i < AnnotateList.size(); i++) {
-//            compGen = AnnotateList.get(i);
-//            if(compGen.isDefined()){
-//                //Generate code to this component
-//                MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
-//            }
-//        }
+        
         //SOME INFORMATIONS
         String inf;
         for (i = 0; i < AnnotateList.size(); i++) {
