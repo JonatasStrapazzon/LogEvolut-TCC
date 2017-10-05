@@ -208,14 +208,14 @@ public class Generate {
                             listLP.clear();
                         }
                     }
-                    
-                    if(!compGen.Generated){
+
+                    if (!compGen.Generated) {
                         // insert in the end
                         CreateComp.add(compGen);
                     }
                     compGen.setGenerated(true);
                 }
-                
+
                 if (!compGen.isFinished() || !compGen.Generated) {
                     Defined = false;
                 }
@@ -226,7 +226,7 @@ public class Generate {
         AnnotateList.clear();
         AnnotateList.addAll(CreateComp);
         CreateComp.clear();
-        
+
         for (i = 0; i < AnnotateList.size(); i++) {
             compGen = AnnotateList.get(i);
             compGen.setGenerated(false);
@@ -246,7 +246,6 @@ public class Generate {
 //                MyReporter.AddInfo("Inf Output: " + inf);
 //            }
 //        }
-
         // no errors!
         return (No_Errors);
     }
@@ -384,6 +383,7 @@ public class Generate {
 
         String componentName;
         String componentLabel;
+        GeneratorComponent compGenCode;
 
         for (Component comp : components) {
             if (comp.getFactory() instanceof Tunnel) {
@@ -435,6 +435,15 @@ public class Generate {
 
         for (i = 2; i < digitalWrite.size() + 2; i++) {
             listaWrite += digitalWrite.get(i - 2) + "\n";
+        }
+
+        for (i = 0; i < AnnotateList.size(); i++) {
+            compGenCode = AnnotateList.get(i);
+            if (compGenCode.toCode().substring(0, 3).contains("T")) {
+                listaVars += "boolean " + compGenCode.toCode().substring(0,
+                        compGenCode.toCode().indexOf("=") - 1) + ";" + "\n";
+            }
+            code += "   " + compGenCode.toCode();
         }
 
         String s = listaPinos
