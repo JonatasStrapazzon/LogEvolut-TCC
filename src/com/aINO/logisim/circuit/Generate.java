@@ -186,7 +186,7 @@ public class Generate {
                         compGen.setOutput(0, "T" + cont);
                         cont++;
                     }
-                    MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
+                    //MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
                     for (EndData end : ends) {
                         Location loc = end.getLocation();
                         if (end.isOutput()) {
@@ -209,11 +209,14 @@ public class Generate {
                         }
                     }
                     
-                    // insert in the end
-                    CreateComp.add(compGen);
+                    if(!compGen.Generated){
+                        // insert in the end
+                        CreateComp.add(compGen);
+                    }
+                    compGen.setGenerated(true);
                 }
-
-                if (!compGen.isFinished()) {
+                
+                if (!compGen.isFinished() || !compGen.Generated) {
                     Defined = false;
                 }
             }
@@ -223,21 +226,26 @@ public class Generate {
         AnnotateList.clear();
         AnnotateList.addAll(CreateComp);
         CreateComp.clear();
-        CreateComp = null;
         
-        //SOME INFORMATIONS
-        String inf;
         for (i = 0; i < AnnotateList.size(); i++) {
-            MyReporter.AddInfo("CompName: " + AnnotateList.get(i).getCompName());
-            for (int j = 0; j < AnnotateList.get(i).getInputsPort().size(); j++) {
-                inf = AnnotateList.get(i).getInput(j);
-                MyReporter.AddInfo("Inf Input: " + inf);
-            }
-            for (int jj = 0; jj < AnnotateList.get(i).getOutputsPort().size(); jj++) {
-                inf = AnnotateList.get(i).getOutput(jj);
-                MyReporter.AddInfo("Inf Output: " + inf);
-            }
+            compGen = AnnotateList.get(i);
+            compGen.setGenerated(false);
+            MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
         }
+
+        //SOME INFORMATIONS
+//        String inf;
+//        for (i = 0; i < AnnotateList.size(); i++) {
+//            MyReporter.AddInfo("CompName: " + AnnotateList.get(i).getCompName());
+//            for (int j = 0; j < AnnotateList.get(i).getInputsPort().size(); j++) {
+//                inf = AnnotateList.get(i).getInput(j);
+//                MyReporter.AddInfo("Inf Input: " + inf);
+//            }
+//            for (int jj = 0; jj < AnnotateList.get(i).getOutputsPort().size(); jj++) {
+//                inf = AnnotateList.get(i).getOutput(jj);
+//                MyReporter.AddInfo("Inf Output: " + inf);
+//            }
+//        }
 
         // no errors!
         return (No_Errors);

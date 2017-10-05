@@ -61,6 +61,10 @@ public class GeneratorComponent {
         // set i output to Var 
         Outputs.set(i, Var);
     }
+    
+    public void setGenerated(boolean g){
+        Generated = g;
+    }
 
     public String getInput(int i) {
         // get i input to Var name
@@ -138,9 +142,6 @@ public class GeneratorComponent {
             // finish code line with ; and a new line char
             Code += Suf + ";\n";
         }
-        
-        // code is generated
-        Generated = true;
 
         return (Code);
     }
@@ -201,6 +202,10 @@ public class GeneratorComponent {
     
     public Component getComp(){
         return (Comp);
+    }
+    
+    public boolean getGenerated(){
+        return (Generated);
     }
     
     public String getCompName(){
