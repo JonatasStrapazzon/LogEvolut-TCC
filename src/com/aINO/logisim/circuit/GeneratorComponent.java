@@ -21,6 +21,8 @@ public class GeneratorComponent {
     private ArrayList<String> Outputs;
     private ArrayList<String> labelInp;
     private ArrayList<String> labelOut;
+    
+    boolean Generated;
 
     public GeneratorComponent(Component Comp, int In, int Out, 
             ArrayList<String> labelInputs, ArrayList<String> labelOutputs) {
@@ -31,6 +33,9 @@ public class GeneratorComponent {
         
         // this component (to get type and label)
         this.Comp = Comp;
+        
+        // not generated
+        Generated = false;
 
         // input list
         while (In > 0) {
@@ -122,17 +127,20 @@ public class GeneratorComponent {
 
         for (int out = 0; out < Outputs.size(); out++) {
             // output name
-            Code = Outputs.get(out) + " = ";
+            Code = Outputs.get(out) + " = " + Pref;
             
             // now adds operations
             for (int inp = 0; inp < Inputs.size(); inp++) {
-                if(inp == Inputs.size()-1) Op = "";
-                Code += Pref + Inputs.get(inp) + Suf + Op;
+                if(inp > 0) Code += Op;
+                Code += Inputs.get(inp);
             }
 
             // finish code line with ; and a new line char
-            Code += ";\n";
+            Code += Suf + ";\n";
         }
+        
+        // code is generated
+        Generated = true;
 
         return (Code);
     }
@@ -143,10 +151,10 @@ public class GeneratorComponent {
         
         if(Gate.contains("AND") || Gate.contains("NAND"))
             Operation = " && ";
-        else if(Gate.contains("OR") || Gate.contains("NOR"))
-            Operation = " || ";
         else if(Gate.contains("XOR") || Gate.contains("XNOR"))
             Operation = " ^ ";
+        else if(Gate.contains("OR") || Gate.contains("NOR"))
+            Operation = " || ";
      
         return (Operation);
     }

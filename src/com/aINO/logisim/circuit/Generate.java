@@ -175,6 +175,7 @@ public class Generate {
 
         //To create the temporary variables and generate the code
         boolean Defined = false;
+        ArrayList<GeneratorComponent> CreateComp = new ArrayList<>();
         while (!Defined) {
             Defined = true;
             for (i = 0; i < AnnotateList.size(); i++) {
@@ -183,32 +184,33 @@ public class Generate {
                 if (compGen.isDefined()) {
                     if (compGen.getOutput(0).equals("")) {
                         compGen.setOutput(0, "T" + cont);
-                        MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
-                        for (EndData end : ends) {
-                            Location loc = end.getLocation();
-                            if (end.isOutput()) {
-                                connect = getConnections_port(loc.toString(), locWireStart, locWireEnd, locGate);
-                                ArrayList<String> listLP = getListLocPort();
+                        cont++;
+                    }
+                    MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
+                    for (EndData end : ends) {
+                        Location loc = end.getLocation();
+                        if (end.isOutput()) {
+                            connect = getConnections_port(loc.toString(), locWireStart, locWireEnd, locGate);
+                            ArrayList<String> listLP = getListLocPort();
 
-                                for (int o = 0; o < AnnotateList.size(); o++) {
-                                    for (int x = 0; x < connect.size(); x++) {
-                                        if (AnnotateList.get(o).getCompName().contains(connect.get(x))) {
-                                            for (int l = 0; l < listLP.size(); l++) {
-                                                int idx = AnnotateList.get(o).getIndex(listLP.get(l));
-                                                if (idx > -1) {
-                                                    AnnotateList.get(o).setInput(idx, "T" + cont);
-                                                }
+                            for (int o = 0; o < AnnotateList.size(); o++) {
+                                for (int x = 0; x < connect.size(); x++) {
+                                    if (AnnotateList.get(o).getCompName().contains(connect.get(x))) {
+                                        for (int l = 0; l < listLP.size(); l++) {
+                                            int idx = AnnotateList.get(o).getIndex(listLP.get(l));
+                                            if (idx > -1) {
+                                                AnnotateList.get(o).setInput(idx, compGen.getOutput(0));
                                             }
                                         }
                                     }
                                 }
-                                listLP.clear();
                             }
+                            listLP.clear();
                         }
-                        cont++;
-                    } else if (!compGen.getOutput(0).contains("T")) {
-                        MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
                     }
+                    
+                    // insert in the end
+                    CreateComp.add(compGen);
                 }
 
                 if (!compGen.isFinished()) {
@@ -217,6 +219,12 @@ public class Generate {
             }
         }
 
+        // clear the annotated list
+        AnnotateList.clear();
+        AnnotateList.addAll(CreateComp);
+        CreateComp.clear();
+        CreateComp = null;
+        
         //SOME INFORMATIONS
         String inf;
         for (i = 0; i < AnnotateList.size(); i++) {
