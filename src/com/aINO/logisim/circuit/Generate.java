@@ -206,22 +206,15 @@ public class Generate {
                             }
                         }
                         cont++;
+                    } else if (!compGen.getOutput(0).contains("T")) {
+                        MyReporter.AddInfo("GenerateCode: " + compGen.toCode());
                     }
                 }
-                
+
                 if (!compGen.isFinished()) {
                     Defined = false;
                 }
             }
-            
-//            for(int y = 0; y < AnnotateList.size(); y++){
-//                if (!AnnotateList.get(y).isFinished()) {
-//                    MyReporter.AddInfo(AnnotateList.get(y).getCompName() + " not is finish!");
-//                    Defined = false;
-//                }
-//                else
-//                   MyReporter.AddInfo(AnnotateList.get(y).getCompName() + " is finish!"); 
-//            }
         }
 
         //SOME INFORMATIONS

@@ -106,13 +106,6 @@ public class GeneratorComponent {
             }
         }
         
-        for (j = 0; j < Inputs.size(); j++) {
-            if(Inputs.get(j).equals(""))
-            {
-                return (false);
-            }
-        }
-        
         return (true);
     }
 
@@ -183,7 +176,7 @@ public class GeneratorComponent {
         else if(Gate.contains("NOT"))
             Operation = ")";
         else if(Gate.contains("NOR"))
-            Operation = ") ";
+            Operation = ")";
         else if(Gate.contains("XNOR"))
             Operation = ")";
      
